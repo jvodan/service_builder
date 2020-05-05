@@ -1,8 +1,0 @@
-/encode.rb
-/encode_json_and_marshal.rb
-/encode_json_and_yaml.rb
-/http.rb
-/parse.rb
-/parse_json_and_marshal.rb
-/parse_json_and_yaml.rb
-/parse_stream.rb
