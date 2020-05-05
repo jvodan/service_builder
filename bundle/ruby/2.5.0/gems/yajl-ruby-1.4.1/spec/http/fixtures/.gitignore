@@ -1,0 +1,7 @@
+/http.bzip2.dump
+/http.chunked.dump
+/http.deflate.dump
+/http.error.dump
+/http.gzip.dump
+/http.html.dump
+/http.raw.dump

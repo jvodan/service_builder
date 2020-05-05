@@ -1,0 +1,7 @@
+/bzip2.rb
+/deflate.rb
+/gzip.rb
+/http_stream.rb
+/json_gem.rb
+/version.rb
+/yajl.so
