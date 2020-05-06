@@ -35,8 +35,8 @@ class BlueprintReader
     @bp[:software].keys.each do |k|
       begin
         self.send(k.to_sym, @bp[:software][k])
-      rescue StandardError => e
-        STDERR.puts("#{e}\n #{e.backtrace}")
+      rescue NoSuchMethodException => e
+        STDERR.puts("No Method found for #{k}")
       end
     end
   end
