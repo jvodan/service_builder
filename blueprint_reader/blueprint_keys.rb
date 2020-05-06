@@ -9,7 +9,7 @@ class BlueprintReader
   require_relative 'use'
   def base(details)
     @user = ServiceUser.new(details)
-    @from_image = details[:parent_image]
+    @from_image = "#{details[:parent_image]}:#{@release}"
     #care about User[Run as User ID Primary group create user]
   end
 

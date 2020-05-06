@@ -23,8 +23,9 @@ class BlueprintReader
   :sudoers_line,
   :install_packages_line
 
-  def process_service_bp(url, build_name, dest)
+  def process_service_bp(url, build_name, dest, release)
     @build_name = build_name
+    @release = release
     @dest_dir = dest
     clone_repo(url)
     @bp = load_blueprint()
