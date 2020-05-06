@@ -31,7 +31,7 @@ class BlueprintReader
     details.each do |p|
       @system_packages_line += " #{versioned_package(p)}"
     end
-
+    end
     def consumer_scripts(details)
       details.each_pair do |k,v|
         write_script("service/#{k}.sh", v)
@@ -130,6 +130,6 @@ class BlueprintReader
         add_to(@modules_line, self.send("install_#{m[:type]}_module", m))
       end
     end
-  end
+  
 
 end
