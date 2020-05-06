@@ -1,10 +1,4 @@
 class BlueprintReader
-  def scripts(details)
-    details.keys.each do |k|
-      self.send("#{k}_script", details[k])
-    end
-  end
-  
   def write_script(p, details)
     p = "#{@dest_dir}/#{@build_name}/home/engines/scripts/#{p}"
     d = File.dirname(p)
@@ -16,6 +10,15 @@ class BlueprintReader
     STDERR.puts("#{e}")
   ensure
     f.close
+  end
+
+  def save_actionator(a)
+    write_script("actionators/#{a[:name]}.sh", a[:script])
+  end
+
+  def save_configurator(a)
+    write_script("configurators/set_#{a[:name]}.sh", a[:set_script])
+    write_script("configurators/read_#{a[:name]}.sh", a[:read_script])
   end
 
   def start_script(details)

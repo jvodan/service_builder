@@ -28,7 +28,6 @@ RUN \
   #{line(br.soft_links_line)}\
   #{line(br.log_dir_line)}\
   #{br.sudoers_line}\
-  
 
 USER #{br.user.run_as}
 
@@ -39,9 +38,16 @@ CMD ["/home/engines/scripts/system/start.sh"]
 )
 end
 
+while ARGV[0].start_with?('-')
+  case(ARGV[0])
+  when '-d'
+    delete_existing = true
+  end
+  ARGV.delete_at(0)
+end
 br = BlueprintReader.new
-url='https://github.com/EnginesServices/mysql'
-build_name = 'mysqld'
+url = ARGV[0]#'https://github.com/EnginesServices/mysql'
+build_name = ARGV[1] #'mysqld'
 dest = '/tmp/'
 sd = br.process_service_bp(url, build_name, dest)
 
@@ -49,7 +55,7 @@ br.process_sudoers
 begin
   df = File.new("#{dest}/#{build_name}/Dockerfile",'w')
   df.puts(docker_file(br))
-ensure 
+ensure
   df.close
 end
 
