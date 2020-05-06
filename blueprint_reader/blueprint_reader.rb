@@ -3,6 +3,7 @@ class BlueprintReader
   require 'git'
   require_relative 'blueprint_keys'
   require_relative 'blueprint_load'
+  require_relative 'docker_file'
 
   attr_reader   :included_adds,
   :build_name,
@@ -30,6 +31,7 @@ class BlueprintReader
     clone_repo(url)
     @bp = load_blueprint()
     process_bp
+
   end
 
   def process_bp
@@ -40,6 +42,8 @@ class BlueprintReader
         STDERR.puts("No Method found for #{k}")
       end
     end
+    process_sudoers
+    save_docker_file
   end
 
   def build_env
