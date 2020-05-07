@@ -5,7 +5,7 @@ class BlueprintReader
   require_relative 'blueprint_load'
   require_relative 'docker_file'
 
-  attr_reader   :included_adds,
+  attr_accessor   :included_adds,
   :build_name,
   :user,
   :syslog_support,
@@ -19,10 +19,15 @@ class BlueprintReader
   :modules_line,
   :sed_line,
   :included_adds_line,
+  :included_adds,
   :repos_line,
   :sudoers_add,
   :sudoers_line,
-  :install_packages_line
+  :install_packages_line,
+  :install_script_line,
+  :post_install_script_line,
+  :template_line,
+  :template_adds
 
   def process_service_bp(url, build_name, dest, release)
     @build_name = build_name
@@ -37,9 +42,10 @@ class BlueprintReader
   def process_bp
     @bp[:software].keys.each do |k|
       begin
+        STDERR.puts("BP key #{k}")
         self.send(k.to_sym, @bp[:software][k])
       rescue NoSuchMethodException => e
-        STDERR.puts("No Method found for #{k}")
+        STDERR.puts("No Method found for #{e} \n #{e.backtace}")
       end
     end
     process_sudoers
@@ -49,12 +55,19 @@ class BlueprintReader
   def build_env
     @build_env ||= []
   end
+  
+  def script_base
+    @script_base ||= '/home/engines/scripts'
+  end
 
   def add_to(cvar, val)
-    if cvar.nil?
-      cvar = val
+    STDERR.puts("ADD TO #{cvar}, #{val}")
+    ivar = self.instance_variable_get(cvar)
+    STDERR.puts("ADD TO #{ivar}, #{val}")
+    if ivar.nil?
+      self.instance_variable_set(cvar, val)
     else
-      cvar += val
+      self.instance_variable_set(cvar, ivar + val)
     end
   end
 

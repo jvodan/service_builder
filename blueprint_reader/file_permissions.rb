@@ -1,5 +1,7 @@
 class BlueprintReader
   def add_file_perm(f)
+    STDERR.puts("addfile_per, #{f}")
+
     add_file_perm_cmd(file_perm_create(f)) unless f[:create].nil?
     add_file_perm_cmd(file_perm_chown(f))
     add_file_perm_cmd(file_perm_chmod(f)) unless f[:permissions].nil?
@@ -7,12 +9,13 @@ class BlueprintReader
 
   def add_file_perm_cmd(l)
     @file_permissions_line += " &&\\\n" unless @file_permissions_line.nil?
-    add_to(@file_permissions_line, l)
+    add_to('@file_permissions_line', l)
+    STDERR.puts("addfile_percmd, #{l} _#{@file_permissions_line}_")
   end
 
   def file_perm_create(f)
     if f[:create] == 'dir'
-      "mkdir -d #{f[:path]}"
+      "mkdir -p #{f[:path]}"
     elsif f[:create] = 'file'
       %Q(
       if ! test -f #{f[:path]} \
