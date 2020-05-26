@@ -3,10 +3,14 @@ class BlueprintReader
     @build_script_dir ||= "#{script_base}/build"
   end
 
-  def write_script(p, content) 
-    write_file("#{@dest_dir}/#{@build_name}#{script_base}/#{p}", content, 0550)
+  def runtime_script_dir
+    @runtime_script_dir ||= "/#{@dest_dir}/#{@build_name}#{script_base}"
   end
-  
+
+  def write_script(p, content)
+    write_file("#{runtime_script_dir}/#{p}", content, 0550)
+  end
+
   def write_file(p, content, perms=0444)
     perms=0444 if perms.nil?
     d = File.dirname(p)
@@ -21,12 +25,25 @@ class BlueprintReader
   end
 
   def save_actionator(a)
-    write_script("actionators/#{a[:name]}.sh", a[:script])
+    write_script("actionators/#{a[:name]}.sh", a[:script][:content])
+    unless a[:script_sudo].nil?
+      p = "actionators/sudo/#{a[:name]}.sh"
+      write_script(p, a[:script_sudo][:content])
+      sudoers.push("#{script_base}/#{p}")
+    end
   end
 
   def save_configurator(a)
-    write_script("configurators/set_#{a[:name]}.sh", a[:set_script])
-    write_script("configurators/read_#{a[:name]}.sh", a[:read_script])
+    rc = a[:read_script][:content] unless a[:read_script].nil?
+    sc = a[:set_script][:content]
+    write_script("configurators/set_#{a[:name]}.sh", sc)
+    write_script("configurators/read_#{a[:name]}.sh", rc )
+    unless a[:set_script_sudo].nil?
+      p = "configurators/sudo/set_#{a[:name]}.sh"
+      write_script(p, a[:set_script_sudo][:content])
+      sudoers.push("#{script_base}/#{p}")
+    end
+
   end
 
   def start_script(details)
@@ -34,7 +51,7 @@ class BlueprintReader
   end
 
   def start_sudo_script(details)
-    sudoers.push('#{script_base}/startup/sudo/start.sh')
+    sudoers.push("#{script_base}/startup/sudo/start.sh")
     write_script('startup/sudo/start.sh', details[:content])
   end
 
@@ -93,4 +110,14 @@ class BlueprintReader
   def shutdown_script(details)
     write_script('startup/shutdown.sh', details[:content])
   end
+
+  def install_sudo_script(details)
+    @multistage_build_text = details[:content]
+    STDERR.puts("#{@multistage_build_text}")
+  end
+  
+  def post_install_sudo_script(details)
+     @multistage_from_text = details[:content]
+    STDERR.puts("#{@multistage_from_text}")
+   end 
 end

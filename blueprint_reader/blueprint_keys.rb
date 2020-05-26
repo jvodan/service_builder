@@ -42,7 +42,7 @@ class BlueprintReader
 
   def consumer_scripts(details)
     details.each_pair do |k,v|
-      write_script("service/#{k}.sh", v)
+      write_script("services/#{k}_service.sh", v[:content])
     end
     rescue StandardError => e
       STDERR.puts("#{e} \nbt: #{e.backtrace}")
@@ -50,6 +50,7 @@ class BlueprintReader
 
   def scripts(details)
     details.keys.each do |k|
+      STDERR.puts("Key #{k}")
       self.send("#{k}_script", details[k])
     end
     rescue StandardError => e
@@ -75,7 +76,7 @@ class BlueprintReader
   def log_directories(details)
     details.each do |l|
       @log_dir_line += "&&\\n" unless @log_dir_line.nil?
-      add_to('@log_dir_line', "mkdir #{l} && chown #{@cont_user} #{l}")
+      add_to('@log_dir_line', "mkdir -p #{l} && chown #{@user.run_as} #{l}")
     end
       rescue StandardError => e
         STDERR.puts("#{e} \nbt: #{e.backtrace}")
@@ -89,8 +90,6 @@ class BlueprintReader
       STDERR.puts("#{e} \nbt: #{e.backtrace}")
   end
 
-
-
   def external_repositories(details)
     details.each do |r|
       @repos_line += "&&\\\n" unless @repos_line.nil?
@@ -103,7 +102,7 @@ class BlueprintReader
 
   def included_files(details)
     details.each do |d|
-      add_to('@included_adds', "{ADD #{d[:source]} #{d[:destination]}\n")
+      add_to('@included_adds', "ADD #{d[:source]} #{d[:destination]}\n")
       d[:path] = d[:destination]
       @included_adds_line += " &&\\\n" unless @included_adds_line.nil?
       add_to('@included_adds_line', add_file_perm(d))
@@ -115,7 +114,7 @@ class BlueprintReader
 
   def soft_links(details)
     details.each do |l|
-      @soft_links_line += "&&\\n" unless @log_dir_line.nil?
+      @soft_links_line += "&&\\\n" unless @log_dir_line.nil?
       add_to('@soft_links_line', "ln -s #{l[:source]} #{l[:target]}")
       @soft_links_line += "&& chown #{@cont_user} #{l[:owner]}" unless l[:owner].nil?
     end
@@ -139,7 +138,7 @@ class BlueprintReader
   def replacement_strings(details)
     details.each do |s|
       @sed_line +="&& \\\n" unless @sed_line.nil?
-      add_to('@sed_line', " cat #{s[:source_file]} | sed \"#{string}\" >/tmp/.sed && mv /tmp/.sed #{s[:destination_file]}")
+      add_to('@sed_line', " cat #{s[:source_file]} | sed \"#{s[:string]}\" >/tmp/.sed && mv /tmp/.sed #{s[:destination_file]}")
     end
       rescue StandardError => e
         STDERR.puts("#{e} \nbt: #{e.backtrace}")
@@ -157,13 +156,13 @@ class BlueprintReader
   def template_files(details)
     details.each do |d|
       save_template(d)
-      @template_adds = 'COPY templates/ /' if  @template_adds.nil?
+      @template_adds = 'COPY templates/ /' if @template_adds.nil?
       add_to('@template_line', template_ownership(d))
     end
   rescue StandardError => e
     STDERR.puts("#{e} \nbt: #{e.backtrace}")
   end
-
+  
   def installed_packages(details)
 
     details.each do |d|

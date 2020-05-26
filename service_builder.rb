@@ -1,5 +1,5 @@
 require_relative 'blueprint_reader/blueprint_reader.rb'
-
+require_relative 'docker_image_factory.rb'
 
 def remove_existing(d)
   FileUtils.rm_r(d) if Dir.exist?(d)
@@ -29,7 +29,12 @@ def do_build(url, build_name)
   remove_existing("#{@dest}/#{build_name}") if @delete_existing == true
 
   sd = br.process_service_bp(url, build_name, @dest, @release)
-
+  ENV['DOCKER_URL'] = 'unix://var/run/docker.sock'
+  DockerImageFactory.build_image({ name: build_name,
+    release: @release,
+    delete_existing: @delete_existing,
+    path: @dest
+  }) if @do_build
 end
 
 def process_args
@@ -78,7 +83,8 @@ def process_args
         STDERR.puts("Incorrect number of params \n#{usage}")
         exit -1
       end
-      do_build(ARGV[0], ARGV[1])
+      i =  do_build(ARGV[0], ARGV[1])
+      STDERR.puts("Built #{i}")
     else
       process_batch
     end

@@ -27,7 +27,9 @@ class BlueprintReader
   :install_script_line,
   :post_install_script_line,
   :template_line,
-  :template_adds
+  :template_adds,
+  :multistage_build_text,
+  :multistage_from_text
 
   def process_service_bp(url, build_name, dest, release)
     @build_name = build_name
@@ -42,7 +44,6 @@ class BlueprintReader
   def process_bp
     @bp[:software].keys.each do |k|
       begin
-        STDERR.puts("BP key #{k}")
         self.send(k.to_sym, @bp[:software][k])
       rescue NoSuchMethodException => e
         STDERR.puts("No Method found for #{e} \n #{e.backtace}")
@@ -61,9 +62,7 @@ class BlueprintReader
   end
 
   def add_to(cvar, val)
-    STDERR.puts("ADD TO #{cvar}, #{val}")
     ivar = self.instance_variable_get(cvar)
-    STDERR.puts("ADD TO #{ivar}, #{val}")
     if ivar.nil?
       self.instance_variable_set(cvar, val)
     else
