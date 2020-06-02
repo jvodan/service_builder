@@ -8,6 +8,9 @@ class BlueprintReader
     #not used to build
   end
 
+  def schedules(details)
+  end
+  
   def target_environment_variables(details)
     #not used to build
   end

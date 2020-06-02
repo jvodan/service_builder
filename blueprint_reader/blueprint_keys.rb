@@ -42,6 +42,19 @@ class BlueprintReader
 
   def consumer_scripts(details)
     details.each_pair do |k,v|
+      STDERR.puts("Script k is ..#{k}..")
+      case "#{k}"
+      when 'remove'
+        STDERR.puts('REMOVE')
+        k = 'rm'
+      when 'add_sudo'
+        k = 'sudo/add'  
+        sudoers.push("#{script_base}/services/#{k}_service.sh")
+      when 'remove_sudo' 
+        k = 'sudo/rm' 
+        sudoers.push("#{script_base}/services/#{k}_service.sh")
+      end
+      STDERR.puts("Script k is #{k}")
       write_script("services/#{k}_service.sh", v[:content])
     end
     rescue StandardError => e

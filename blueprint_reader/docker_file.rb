@@ -47,11 +47,14 @@ class BlueprintReader
     #{line(sudoers_line)}\
     #{line(post_install_script_line)}\
     #{build_script_dir}/post_build_clean.sh  
+    
+  
+    #Kludge to deal with use of the name remove_service.sh instead of rm_service.sh which engines excpets
+      RUN ln -s /home/engines/scripts/services/remove_service.sh /home/engines/scripts/services/rm_service.sh; id 
   USER #{user.run_as}
-
+   
   ENV ContUser #{user.run_as}
   ENV ContGrp #{user.gname}
-    RUN id ; ls -la /home/engines/scripts/startup
   CMD ["#{script_base}/system/start.sh"]
   )
   end
