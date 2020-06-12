@@ -1,4 +1,4 @@
-class DockerImageFactory
+class DockerFactory
   require 'docker'
   require 'json'
   
@@ -17,5 +17,10 @@ class DockerImageFactory
   end
   def self.docker_options(tag)
     { 'dockerfile' => 'Dockerfile', 't' => tag, 'forcerm' => true}
+  end
+  
+  def self.create_container(options)
+    r = Docker::Container.create(options)
+    STDERR.puts("Container Create #{r}")
   end
 end

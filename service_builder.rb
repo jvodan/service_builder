@@ -1,5 +1,5 @@
 require_relative 'blueprint_reader/blueprint_reader.rb'
-require_relative 'docker_image_factory.rb'
+require_relative 'docker_factory.rb'
 
 def remove_existing(d)
   FileUtils.rm_r(d) if Dir.exist?(d)
@@ -25,16 +25,20 @@ ensure
 end
 
 def do_build(url, build_name)
-  br = BlueprintReader.new
+  br = BlueprintReader.new(build_name, ctype = :service)
   remove_existing("#{@dest}/#{build_name}") if @delete_existing == true
-
-  sd = br.process_service_bp(url, build_name, @dest, @release)
+  
+  sd = br.process_service_bp(url, @dest, @release)
   ENV['DOCKER_URL'] = 'unix://var/run/docker.sock'
-  DockerImageFactory.build_image({ name: build_name,
+  DockerFactory.build_image({ name: build_name,
     release: @release,
     delete_existing: @delete_existing,
     path: @dest
   }) if @do_build
+  ENV['DOCKER_IP'] = '192.168.208.98'
+  options = br.container.docker_create_options
+  STDERR.puts("#{options.to_json}")
+  DockerFactory.create_container(options)
 end
 
 def process_args

@@ -4,7 +4,8 @@ class BlueprintReader
   require_relative 'blueprint_keys'
   require_relative 'blueprint_load'
   require_relative 'docker_file'
-
+  require_relative '../container/container'
+  
   attr_accessor   :included_adds,
   :build_name,
   :user,
@@ -29,16 +30,21 @@ class BlueprintReader
   :template_line,
   :template_adds,
   :multistage_build_text,
-  :multistage_from_text
+  :multistage_from_text,
+  :container
+  
+  def initialize(name, type)
+    @container = Container.new(name, type)
+    @build_name = name
+  end
 
-  def process_service_bp(url, build_name, dest, release)
-    @build_name = build_name
+  def process_service_bp(url, dest, release)
+    container.image = "engines/#{@build_name}:#{release}"
     @release = release
     @dest_dir = dest
     clone_repo(url)
     @bp = load_blueprint()
     process_bp
-
   end
 
   def process_bp

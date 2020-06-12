@@ -9,7 +9,6 @@ class ServiceUser
     @uid = 200200 if @uid.nil?
     end
   
-
   def create_line
     if create? == true
       %Q(groupadd -g #{@uid}  #{@gname}  ;\\
@@ -22,9 +21,13 @@ class ServiceUser
         usermod  -u #{@uid}  -G containers #{@run_as}; \
        fi &&\\
       usermod -a -G containers #{@run_as} &&\\
-      chown -R #{@run_as} ~#{@run_as}&&\\)                     
+      mkdir -p ~#{@run_as}&&\\
+      chown -R #{@run_as} ~#{@run_as})                     
     else 
-      "usermod -a -G containers #{@run_as}&&\\"
+      %Q(usermod -a -G containers #{@run_as}&&\\
+      usermod  -u #{@uid} #{@run_as}&&\\
+      mkdir -p ~#{@run_as}&&\\
+      chown -R #{@run_as} ~#{@run_as})
     end
   end
   def create?

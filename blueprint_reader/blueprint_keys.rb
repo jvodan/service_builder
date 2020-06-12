@@ -118,7 +118,7 @@ class BlueprintReader
       add_to('@included_adds', "ADD #{d[:source]} #{d[:destination]}\n")
       d[:path] = d[:destination]
       @included_adds_line += " &&\\\n" unless @included_adds_line.nil?
-      add_to('@included_adds_line', add_file_perm(d))
+     # add_to('@included_adds_line', add_file_perm(d))
       #         "template": true
     end
       rescue StandardError => e
@@ -174,6 +174,10 @@ class BlueprintReader
     end
   rescue StandardError => e
     STDERR.puts("#{e} \nbt: #{e.backtrace}")
+  end
+  
+  def ports(details)
+    container.ports=(details)
   end
   
   def installed_packages(details)
