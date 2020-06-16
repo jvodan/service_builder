@@ -12,7 +12,7 @@ def volumes_mounts(container)
   mounts = []
   unless container.volumes.nil?
     container.volumes.each_value do |volume|
-      mounts.push(mount_string(volume))
+      mounts.push(mount_string_from_hash(volume))
     end
   end
 
@@ -92,6 +92,7 @@ rescue Exception => e
 end
 
 def  mount_string_from_hash(vol)
+  STDERR.puts("Moutn #{vol}")
   unless vol[:variables][:permissions].nil? || vol[:variables][:volume_src].nil?  || vol[:variables][:engine_path].nil?
     perms = 'ro'
     if vol[:variables][:permissions] == 'rw'

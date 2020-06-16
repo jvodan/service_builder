@@ -1,8 +1,6 @@
 class BlueprintReader
   #keys within blueprint that are not used defined here to avoid no such method error 
-  def service_configurations(details)
-    #not used to build EXCEPT environment
-  end
+
 
   def constants(details)
     #not used to build
@@ -24,6 +22,6 @@ class BlueprintReader
   end
 
   def custom_files(details)
-    #dont use, this function include
+    #dont use, this function has been replaced by included files
   end
 end

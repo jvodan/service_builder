@@ -36,6 +36,10 @@ class Container
     @capabilities = []
   end
 
+   def volumes 
+     @volumes ||= {}
+   end
+   
   def store_address
     @store_address ||= { c_name: @container_name.to_s, c_type: @ctype.to_s }
   end
